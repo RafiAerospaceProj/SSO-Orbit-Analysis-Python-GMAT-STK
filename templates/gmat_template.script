@@ -1,0 +1,275 @@
+%General Mission Analysis Tool(GMAT) Script
+%Created: 2025-05-19 10:49:30
+
+%----------------------------------------
+%---------- Spacecraft
+%----------------------------------------
+
+Create Spacecraft Sat1;
+Sat1.DateFormat = UTCGregorian;
+Sat1.Epoch = '1 Jun 2025 00:00:00.000';
+Sat1.CoordinateSystem = EarthMJ2000Eq;
+Sat1.DisplayStateType = Keplerian;
+Sat1.SMA = {{SMA}};
+Sat1.ECC = {{ECC}};
+Sat1.INC = {{INC}};
+Sat1.RAAN = {{RAAN}};
+Sat1.AOP = 0;
+Sat1.TA = 0;
+
+Sat1.DryMass = 850;
+Sat1.Cd = 2.2;
+Sat1.Cr = 1.8;
+Sat1.DragArea = 15;
+Sat1.SRPArea = 1;
+Sat1.SPADDragScaleFactor = 1;
+Sat1.SPADSRPScaleFactor = 1;
+Sat1.AtmosDensityScaleFactor = 1;
+Sat1.ExtendedMassPropertiesModel = 'None';
+Sat1.NAIFId = -10000001;
+Sat1.NAIFIdReferenceFrame = -9000001;
+Sat1.OrbitColor = Red;
+Sat1.TargetColor = Teal;
+Sat1.OrbitErrorCovariance = [ 1e+70 0 0 0 0 0 ; 0 1e+70 0 0 0 0 ; 0 0 1e+70 0 0 0 ; 0 0 0 1e+70 0 0 ; 0 0 0 0 1e+70 0 ; 0 0 0 0 0 1e+70 ];
+Sat1.CdSigma = 1e+70;
+Sat1.CrSigma = 1e+70;
+Sat1.Id = 'SatId';
+Sat1.Attitude = NadirPointing;
+Sat1.SPADSRPInterpolationMethod = Bilinear;
+Sat1.SPADSRPScaleFactorSigma = 1e+70;
+Sat1.SPADDragInterpolationMethod = Bilinear;
+Sat1.SPADDragScaleFactorSigma = 1e+70;
+Sat1.AtmosDensityScaleFactorSigma = 1e+70;
+Sat1.ModelFile = 'aura.3ds';
+Sat1.ModelOffsetX = 0;
+Sat1.ModelOffsetY = 0;
+Sat1.ModelOffsetZ = 0;
+Sat1.ModelRotationX = 0;
+Sat1.ModelRotationY = 0;
+Sat1.ModelRotationZ = 0;
+Sat1.ModelScale = 1;
+Sat1.AttitudeDisplayStateType = 'Quaternion';
+Sat1.AttitudeRateDisplayStateType = 'AngularVelocity';
+Sat1.EulerAngleSequence = '321';
+Sat1.AttitudeReferenceBody = Earth;
+Sat1.AttitudeConstraintType = 'OrbitNormal';
+Sat1.BodyAlignmentVectorX = 1;
+Sat1.BodyAlignmentVectorY = 0;
+Sat1.BodyAlignmentVectorZ = 0;
+Sat1.BodyConstraintVectorX = 0;
+Sat1.BodyConstraintVectorY = 0;
+Sat1.BodyConstraintVectorZ = 1;
+
+%----------------------------------------
+%---------- GroundStations
+%----------------------------------------
+
+Create GroundStation Boulder;
+Boulder.OrbitColor = Thistle;
+Boulder.TargetColor = DarkGray;
+Boulder.CentralBody = Earth;
+Boulder.StateType = Spherical;
+Boulder.HorizonReference = Sphere;
+Boulder.Location1 = {{LAT}};
+Boulder.Location2 = {{LONG}};
+Boulder.Location3 = {{ALT}};
+Boulder.Id = 'StationId';
+Boulder.IonosphereModel = 'None';
+Boulder.TroposphereModel = 'None';
+Boulder.DataSource = 'Constant';
+Boulder.Temperature = 295.1;
+Boulder.Pressure = 1013.5;
+Boulder.Humidity = 55;
+Boulder.MinimumElevationAngle = 30;
+
+
+
+
+
+
+
+
+
+%----------------------------------------
+%---------- ForceModels
+%----------------------------------------
+
+%DefaultProp_ForceModel.SRP = On;
+%DefaultProp_ForceModel.RelativisticCorrection = Off;
+%DefaultProp_ForceModel.ErrorControl = RSSStep;
+Create ForceModel DefaultProp_ForceModel;
+DefaultProp_ForceModel.CentralBody = Earth;
+DefaultProp_ForceModel.PrimaryBodies = {Earth};
+DefaultProp_ForceModel.SRP = On;
+DefaultProp_ForceModel.RelativisticCorrection = Off;
+DefaultProp_ForceModel.ErrorControl = RSSStep;
+DefaultProp_ForceModel.GravityField.Earth.Degree = 4;
+DefaultProp_ForceModel.GravityField.Earth.Order = 4;
+DefaultProp_ForceModel.GravityField.Earth.StmLimit = 100;
+DefaultProp_ForceModel.GravityField.Earth.PotentialFile = 'JGM2.cof';
+DefaultProp_ForceModel.GravityField.Earth.TideModel = 'None';
+DefaultProp_ForceModel.SRP.Flux = 1367;
+DefaultProp_ForceModel.SRP.SRPModel = Spherical;
+DefaultProp_ForceModel.SRP.Nominal_Sun = 149597870.691;
+DefaultProp_ForceModel.Drag.AtmosphereModel = JacchiaRoberts;
+DefaultProp_ForceModel.Drag.HistoricWeatherSource = 'ConstantFluxAndGeoMag';
+DefaultProp_ForceModel.Drag.PredictedWeatherSource = 'ConstantFluxAndGeoMag';
+DefaultProp_ForceModel.Drag.CSSISpaceWeatherFile = 'SpaceWeather-All-v1.2.txt';
+DefaultProp_ForceModel.Drag.SchattenFile = 'SchattenPredict.txt';
+DefaultProp_ForceModel.Drag.F107 = 150;
+DefaultProp_ForceModel.Drag.F107A = 150;
+DefaultProp_ForceModel.Drag.MagneticIndex = 3;
+DefaultProp_ForceModel.Drag.SchattenErrorModel = 'Nominal';
+DefaultProp_ForceModel.Drag.SchattenTimingModel = 'NominalCycle';
+DefaultProp_ForceModel.Drag.DragModel = 'Spherical';
+
+%----------------------------------------
+%---------- Propagators
+%----------------------------------------
+
+Create Propagator DefaultProp;
+DefaultProp.FM = DefaultProp_ForceModel;
+DefaultProp.Type = RungeKutta89;
+DefaultProp.InitialStepSize = 60;
+DefaultProp.Accuracy = 9.999999999999999e-12;
+DefaultProp.MinStep = 0.01;
+DefaultProp.MaxStep = 2700;
+DefaultProp.MaxStepAttempts = 50;
+DefaultProp.StopIfAccuracyIsViolated = true;
+
+%----------------------------------------
+%---------- Burns
+%----------------------------------------
+
+Create ImpulsiveBurn DefaultIB;
+DefaultIB.CoordinateSystem = Local;
+DefaultIB.Origin = Earth;
+DefaultIB.Axes = VNB;
+DefaultIB.Element1 = 0;
+DefaultIB.Element2 = 0;
+DefaultIB.Element3 = 0;
+DefaultIB.DecrementMass = false;
+DefaultIB.Isp = 300;
+DefaultIB.GravitationalAccel = 9.81;
+
+%----------------------------------------
+%---------- EventLocators
+%----------------------------------------
+
+Create ContactLocator ContactLocator1;
+ContactLocator1.Target = Sat1;
+ContactLocator1.Filename = 'ContactLocator1.txt';
+ContactLocator1.InputEpochFormat = 'TAIModJulian';
+ContactLocator1.InitialEpoch = '21545';
+ContactLocator1.StepSize = 600;
+ContactLocator1.FinalEpoch = '21545.138';
+ContactLocator1.UseLightTimeDelay = true;
+ContactLocator1.UseStellarAberration = true;
+ContactLocator1.WriteReport = true;
+ContactLocator1.RunMode = Automatic;
+ContactLocator1.UseEntireInterval = true;
+ContactLocator1.Observers = {Boulder};
+ContactLocator1.LightTimeDirection = Receive;
+ContactLocator1.LeftJustified = false;
+ContactLocator1.ReportPrecision = 6;
+ContactLocator1.ReportFormat = 'Legacy';
+ContactLocator1.IntervalStepSize = 0;
+ContactLocator1.ReportTimeFormat = 'UTCGregorian';
+
+%----------------------------------------
+%---------- Solvers
+%----------------------------------------
+
+Create DifferentialCorrector DefaultDC;
+DefaultDC.ShowProgress = true;
+DefaultDC.ReportStyle = Normal;
+DefaultDC.ReportFile = 'DifferentialCorrectorDefaultDC.data';
+DefaultDC.MaximumIterations = 25;
+DefaultDC.DerivativeMethod = ForwardDifference;
+DefaultDC.Algorithm = NewtonRaphson;
+
+
+%----------------------------------------
+%---------- Subscribers
+%----------------------------------------
+
+Create OrbitView DefaultOrbitView;
+DefaultOrbitView.SolverIterations = Current;
+DefaultOrbitView.UpperLeft = [ 0 -0.01610017889087657 ];
+DefaultOrbitView.Size = [ 0.3564705882352941 0.8586762075134168 ];
+DefaultOrbitView.RelativeZOrder = 92;
+DefaultOrbitView.Maximized = true;
+DefaultOrbitView.Add = {Sat1, Earth};
+DefaultOrbitView.CoordinateSystem = EarthMJ2000Eq;
+DefaultOrbitView.DrawObject = [ true true ];
+DefaultOrbitView.DataCollectFrequency = 1;
+DefaultOrbitView.UpdatePlotFrequency = 50;
+DefaultOrbitView.NumPointsToRedraw = 0;
+DefaultOrbitView.ShowPlot = true;
+DefaultOrbitView.MaxPlotPoints = 20000;
+DefaultOrbitView.ShowLabels = true;
+DefaultOrbitView.ViewPointReference = Earth;
+DefaultOrbitView.ViewPointVector = [ 0 120000 0 ];
+DefaultOrbitView.ViewDirection = Earth;
+DefaultOrbitView.ViewScaleFactor = 1;
+DefaultOrbitView.ViewUpCoordinateSystem = EarthMJ2000Eq;
+DefaultOrbitView.ViewUpAxis = Z;
+DefaultOrbitView.EclipticPlane = Off;
+DefaultOrbitView.XYPlane = On;
+DefaultOrbitView.WireFrame = Off;
+DefaultOrbitView.Axes = On;
+DefaultOrbitView.Grid = Off;
+DefaultOrbitView.SunLine = Off;
+DefaultOrbitView.UseInitialView = On;
+DefaultOrbitView.StarCount = 7000;
+DefaultOrbitView.EnableStars = On;
+DefaultOrbitView.EnableConstellations = On;
+
+Create GroundTrackPlot DefaultGroundTrackPlot;
+DefaultGroundTrackPlot.SolverIterations = Current;
+DefaultGroundTrackPlot.UpperLeft = [ 0.4417647058823529 0.4114490161001789 ];
+DefaultGroundTrackPlot.Size = [ 0.3417647058823529 0.4597495527728086 ];
+DefaultGroundTrackPlot.RelativeZOrder = 30;
+DefaultGroundTrackPlot.Maximized = false;
+DefaultGroundTrackPlot.Add = {Boulder, Sat1};
+DefaultGroundTrackPlot.DataCollectFrequency = 1;
+DefaultGroundTrackPlot.UpdatePlotFrequency = 50;
+DefaultGroundTrackPlot.NumPointsToRedraw = 0;
+DefaultGroundTrackPlot.ShowPlot = true;
+DefaultGroundTrackPlot.MaxPlotPoints = 20000;
+DefaultGroundTrackPlot.CentralBody = Earth;
+DefaultGroundTrackPlot.TextureMap = 'ModifiedBlueMarble.jpg';
+
+Create ReportFile LTANReport;
+LTANReport.SolverIterations = Current;
+LTANReport.UpperLeft = [ 0 0 ];
+LTANReport.Size = [ 0 0 ];
+LTANReport.RelativeZOrder = 0;
+LTANReport.Maximized = false;
+LTANReport.Filename = 'ltan_report.txt';
+LTANReport.Precision = 6;
+LTANReport.Add = {Sat1.X, Sat1.Y, Sat1.Z, Sat1.ElapsedDays, Sat1.RAAN, Sat1.Earth.RMAG};
+LTANReport.WriteHeaders = true;
+LTANReport.LeftJustify = On;
+LTANReport.ZeroFill = Off;
+LTANReport.FixedWidth = true;
+LTANReport.Delimiter = ' ';
+LTANReport.ColumnWidth = 23;
+LTANReport.WriteReport = true;
+LTANReport.AppendToExistingFile = false;
+
+%----------------------------------------
+%---------- Arrays, Variables, Strings
+%----------------------------------------
+Create Variable counter maxCounter day;
+counter = 0;
+maxCounter = 10;
+day = 86400;
+
+
+
+%----------------------------------------
+%---------- Mission Sequence
+%----------------------------------------
+BeginMissionSequence;
+Propagate DefaultProp(Sat1) {Sat1.ElapsedDays = 3};

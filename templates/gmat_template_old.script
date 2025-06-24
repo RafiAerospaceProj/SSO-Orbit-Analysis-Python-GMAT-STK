@@ -1,0 +1,59 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% -------- sat --------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Create Spacecraft Sat1;
+Sat1.DateFormat = UTCGregorian;
+Sat1.Epoch = '01 Jan 2020 12:00:00.000';
+Sat1.CoordinateSystem = EarthMJ2000Eq;
+Sat1.DisplayStateType = Keplerian;
+Sat1.SMA = {{SMA}};
+Sat1.ECC = {{ECC}};
+Sat1.INC = {{INC}};
+Sat1.RAAN = {{RAAN}};
+Sat1.AOP = 0;
+Sat1.TA = 0;
+Sat1.DryMass = 500;
+Sat1.Cd = 2.2;
+Sat1.Cr = 1.8;
+Sat1.DragArea = 1.5;
+Sat1.SRPArea = 1.5;
+Sat1.OrbitColor = Red;
+Sat1.TargetColor = Teal;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% -------- force model --------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Create ForceModel EarthDragJ2;
+EarthDragJ2.CentralBody = Earth;
+EarthDragJ2.PrimaryBodies = {Earth};
+EarthDragJ2.Drag = {{DRAG}};
+EarthDragJ2.SRP = {{SRP}};
+EarthDragJ2.Body = Earth;
+EarthDragJ2.GravityField.Earth.Degree = 2;
+EarthDragJ2.GravityField.Earth.Order = 0;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% -------- propagator --------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Create Propagator PropEarth;
+PropEarth.FM = EarthDragJ2;
+PropEarth.Type = RungeKutta89;
+PropEarth.InitialStepSize = 60;
+PropEarth.Accuracy = 1e-12;
+PropEarth.MinStep = 0.1;
+PropEarth.MaxStep = 300;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% -------- report --------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Create ReportFile LTANReport;
+LTANReport.Filename = 'output/gmat_results/ltan_report.txt';
+LTANReport.Add = {Sat1.X, Sat1.Y, Sat1.Z};
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% -------- mission --------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Create MissionSequence;
+BeginMissionSequence;
+Propagate PropEarth(Sat1) {Sat1.ElapsedDays = 10};
+Report LTANReport Sat1.X Sat1.Y Sat1.Z;
